@@ -8,7 +8,7 @@ import (
 )
 
 var Database *gorm.DB
-var urlDSN = "root:ayushigupta7@@tcp(localhost:3306)/company"
+var urlDSN = "root:ayushigupta7@@tcp(localhost:3306)/company?parseTime=true"
 var err error
 
 func DataMigration() {
@@ -17,5 +17,6 @@ func DataMigration() {
 		fmt.Print(err.Error())
 		panic("connection failed")
 	}
-	Database.AutoMigrate(&Employee{})
+
+	Database.AutoMigrate(&User{}, &Tweet{})
 }
