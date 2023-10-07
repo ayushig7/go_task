@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Employee struct {
 	gorm.Model
-	EmpName   string
-	EmpSalary float64
-	Email     string
+	EmpName   string  `json:"empname"`
+	EmpSalary float64 `json:"salary"`
+	Email     string  `json:"email"`
 }
