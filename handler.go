@@ -100,6 +100,37 @@ func GetAllTweets(w http.ResponseWriter, r *http.Request) {
 
     json.NewEncoder(w).Encode(tweets)
 }
+func GetAllUsers(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
 
+    // Query the database to fetch all tweets
+    var users []User
+    Database.Find(&users)
+
+    if len(users) == 0 {
+        http.Error(w, "No tweets found", http.StatusNotFound)
+        return
+    }
+
+    json.NewEncoder(w).Encode(users)
+}
+func GetUserByID(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    // Get the user ID from the query parameter
+    queryParams := r.URL.Query()
+    userID := queryParams.Get("id")
+    fmt.Println("User ID from query parameter:", userID)
+
+
+    // Query the database for tweets with a matching user_id
+    var users []User
+    Database.Where("id = ?", userID).Find(&users)
+
+    if len(users) == 0 {
+        http.Error(w, "No tweets found for the user", http.StatusNotFound)
+        return
+    }
+    json.NewEncoder(w).Encode(users)
+}
 
 
