@@ -14,5 +14,8 @@ func HandlerRouting() {
 	r.HandleFunc("/employee/{eid}", GetEmployeeById).Methods("GET")
 	r.HandleFunc("/addTweet", AddTweet).Methods("POST")
 	r.HandleFunc("/getUserTweets", GetUserTweets).Methods("GET")
+	r.HandleFunc("/getAllTweets", GetAllTweets).Methods("GET")
+	r.HandleFunc("/getAllUsers", GetAllUsers).Methods("GET")
+	r.HandleFunc("/getUserByID", GetUserByID).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

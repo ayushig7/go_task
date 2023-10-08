@@ -14,15 +14,16 @@ type Employee struct {
 }
 
 type User struct {
-	ID     int     `json:"id"`
-	Name   string  `json:"name"`
-	Email  string  `json:"email"`
-	Tweets []Tweet `json:"tweets"`
+    gorm.Model
+    Name   string  `json:"name" gorm:"column:name"`
+    Email  string  `json:"email" gorm:"column:email"`
+    Tweets []Tweet `gorm:"foreignkey:UserID"`
 }
 
 type Tweet struct {
-	ID        int       `json:"id"`
-	Content   string    `json:"content"`
-	UserID    int       `json:"-"`
-	CreatedAt time.Time `json:"created_at"`
+    gorm.Model
+    Content   string    `json:"content" gorm:"column:content"`
+    UserID    uint      `json:"-"`
+    CreatedAt time.Time `json:"created_at" gorm:"column:created_at"`
 }
+
