@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
-
+	"fmt"
 	"github.com/gorilla/mux"
-	"gorm.io/gorm"
 )
 
 func CreateEmployee(w http.ResponseWriter, r *http.Request) {
@@ -69,21 +68,23 @@ func AddTweet(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserTweets(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Content-Type", "application/json")
+    // Get the user ID from the query parameter
+    queryParams := r.URL.Query()
+    userID := queryParams.Get("id")
+    fmt.Println("User ID from query parameter:", userID)
 
-	// Get the user ID from the URL parameter
-	userID := mux.Vars(r)["id"]
 
-	// Fetch the user from the database based on the provided userID
-	var user User
-	Database.Preload("Tweets", func(db *gorm.DB) *gorm.DB {
-		return db.Order("created_at DESC") // Sort tweets by created_at in descending order
-	}).First(&user, userID)
+    // Query the database for tweets with a matching user_id
+    var tweets []Tweet
+    Database.Where("user_id = ?", userID).Order("created_at DESC").Find(&tweets)
 
-	if user.ID == 0 {
-		http.Error(w, "User not found", http.StatusNotFound)
-		return
-	}
+    if len(tweets) == 0 {
+        http.Error(w, "No tweets found for the user", http.StatusNotFound)
+        return
+    }
 
-	json.NewEncoder(w).Encode(user.Tweets)
+    json.NewEncoder(w).Encode(tweets)
 }
+
+
