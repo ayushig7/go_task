@@ -89,17 +89,30 @@ func GetUserTweets(w http.ResponseWriter, r *http.Request) {
 func GetAllTweets(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 
-    // Query the database to fetch all tweets
-    var tweets []Tweet
-    Database.Order("created_at DESC").Find(&tweets)
+    // Query the database to fetch all tweets along with user information
+   type CustomTweet struct {
+       ID         uint      `json:"id"`
+       Content    string    `json:"content"`
+       CreatedAt  time.Time `json:"created_at"`
+       UserName   string    `json:"user_name"`
+       UserEmail  string    `json:"user_email"`
+       UserID  string    `json:"user_id"`
+   }
 
-    if len(tweets) == 0 {
+   var tweetsWithUsers []CustomTweet
+   Database.Table("tweets").Select("tweets.id, tweets.content, tweets.created_at, users.name as user_name,users.id as user_id, users.email as user_email").
+       Joins("INNER JOIN users ON tweets.user_id = users.id").
+       Order("tweets.created_at DESC").Find(&tweetsWithUsers)
+
+
+    if len(tweetsWithUsers) == 0 {
         http.Error(w, "No tweets found", http.StatusNotFound)
         return
     }
 
-    json.NewEncoder(w).Encode(tweets)
+    json.NewEncoder(w).Encode(tweetsWithUsers)
 }
+
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 
