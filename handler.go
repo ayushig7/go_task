@@ -32,39 +32,40 @@ func GetEmployeeById(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddTweet(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Content-Type", "application/json")
 
-	// Get the user ID from the URL parameter
-	userID := mux.Vars(r)["id"]
+    // Get the user ID from the query parameter
+    queryParams := r.URL.Query()
+    userID := queryParams.Get("id")
 
-	// Fetch the user from the database based on the provided userID
-	var user User
-	Database.Preload("Tweets").First(&user, userID)
+    // Fetch the user from the database based on the provided userID
+    var user User
+    Database.Preload("Tweets").First(&user, userID)
 
-	if user.ID == 0 {
-		http.Error(w, "User not found", http.StatusNotFound)
-		return
-	}
+    if user.ID == 0 {
+        http.Error(w, "User not found", http.StatusNotFound)
+        return
+    }
 
-	var tweet Tweet
-	err := json.NewDecoder(r.Body).Decode(&tweet)
-	if err != nil {
-		http.Error(w, "Failed to decode request body", http.StatusBadRequest)
-		return
-	}
+    var tweet Tweet
+    err := json.NewDecoder(r.Body).Decode(&tweet)
+    if err != nil {
+        http.Error(w, "Failed to decode request body", http.StatusBadRequest)
+        return
+    }
 
-	// Set the UserID for the tweet
-	tweet.UserID = user.ID
+    // Set the UserID for the tweet
+    tweet.UserID = user.ID
 
-	// Set the CreatedAt time for the tweet
-	tweet.CreatedAt = time.Now()
+    // Set the CreatedAt time for the tweet
+    tweet.CreatedAt = time.Now()
 
-	// Create a new tweet and append it to the user's tweets
-	user.Tweets = append(user.Tweets, tweet)
+    // Create a new tweet and append it to the user's tweets
+    user.Tweets = append(user.Tweets, tweet)
 
-	Database.Save(&user)
+    Database.Save(&user)
 
-	json.NewEncoder(w).Encode(user)
+    json.NewEncoder(w).Encode(user)
 }
 
 func GetUserTweets(w http.ResponseWriter, r *http.Request) {
